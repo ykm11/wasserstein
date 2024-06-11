@@ -48,6 +48,7 @@ template <typename T>
 void computeCDF(vector<size_t> &idx,
                 const vector<size_t> &cdfIdx, vector<T> &cdf) {
 
+#if 1
   size_t j = 0;
   size_t ordW_size = idx.size();
   vector<T> ordW(ordW_size, 1); // assign the same weight
@@ -61,6 +62,28 @@ void computeCDF(vector<size_t> &idx,
     cdf[j] = sortedAccW[cIdx] / ordW_size;
     j++;
   }
+#else
+  // assign the same weight
+  size_t j;
+  size_t ordW_size = idx.size();
+  //vector<T> ordW(ordW_size, 1); 
+  //T accum = ordW_size;
+
+  cdf.resize(cdfIdx.size());
+  vector<T> sortedAccW(1 + ordW_size);
+  for (j = 0; j < ordW_size + 1; j++) {
+    sortedAccW[j] = (T)(j);
+  }
+  //vector<T> sortedAccW = {0};
+  //partial_sum(ordW.begin(), ordW.end(), ordW.begin());
+  //sortedAccW.insert(sortedAccW.end(), ordW.begin(), ordW.end());
+
+  j = 0;
+  for (auto cIdx : cdfIdx) {
+    cdf[j] = sortedAccW[cIdx] / ordW_size;
+    j++;
+  }
+#endif
 }
 
 template <typename T>
