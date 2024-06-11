@@ -46,4 +46,7 @@ int main(int argc, char** argv){
     dist = wasserstein(av,aw,bv,bw);
     std::cout << "The earth movers distance is: " << dist << std::endl;
 
+    dist = wasserstein(av,bv);
+    std::cout << "The earth movers distance (without weights) is: " << dist << std::endl;
+
 }

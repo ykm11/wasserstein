@@ -45,6 +45,25 @@ void searchSorted(const vector<T> &v, const vector<size_t> &idx,
 }
 
 template <typename T>
+void computeCDF(vector<size_t> &idx,
+                const vector<size_t> &cdfIdx, vector<T> &cdf) {
+
+  size_t j = 0;
+  size_t ordW_size = idx.size();
+  vector<T> ordW(ordW_size, 1); // assign the same weight
+  //T accum = ordW_size;
+
+  cdf.resize(cdfIdx.size());
+  vector<T> sortedAccW = {0};
+  partial_sum(ordW.begin(), ordW.end(), ordW.begin());
+  sortedAccW.insert(sortedAccW.end(), ordW.begin(), ordW.end());
+  for (auto cIdx : cdfIdx) {
+    cdf[j] = sortedAccW[cIdx] / ordW_size;
+    j++;
+  }
+}
+
+template <typename T>
 void computeCDF(const vector<T> &weights, vector<size_t> &idx,
                 const vector<size_t> &cdfIdx, vector<T> &cdf) {
 
@@ -77,6 +96,36 @@ T computeDist(const vector<T> &cdfA, const vector<T> &cdfB,
     dist += abs(cdfA[i] - cdfB[i]) * deltas[i];
   }
   return dist;
+}
+
+template <typename T>
+T wasserstein(vector<T> &A, vector<T> &B) {
+
+  vector<T> allValues;
+  concatenateSort(A, B, allValues);
+
+  vector<T> deltas;
+  diff(allValues, deltas);
+
+  vector<size_t> idxA(A.size());
+  argsort(A, idxA);
+
+  vector<size_t> idxB(B.size());
+  argsort(B, idxB);
+
+  vector<size_t> cdfIdxA;
+  searchSorted(A, idxA, allValues, cdfIdxA);
+
+  vector<size_t> cdfIdxB;
+  searchSorted(B, idxB, allValues, cdfIdxB);
+
+  vector<T> cdfA;
+  computeCDF(idxA, cdfIdxA, cdfA);
+
+  vector<T> cdfB;
+  computeCDF(idxB, cdfIdxB, cdfB);
+
+  return computeDist(cdfA, cdfB, deltas);
 }
 
 template <typename T>
